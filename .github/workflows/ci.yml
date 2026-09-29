@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.2.0
+      - name: bundle drift check (skill/ vs skills/, codex-skills/)
+        run: python3 scripts/build_skill_bundles.py --check
+      - name: plugin manifest version-sync check
+        run: python3 scripts/check-version-sync.py
+      - name: tests
+        run: uvx pytest tests/ -q
