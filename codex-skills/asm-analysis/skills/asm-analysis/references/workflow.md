@@ -52,6 +52,37 @@ pipx install simdref --pip-args "--index-url https://test.pypi.org/simple/ --ext
 
 Never install without asking.
 
+### 0a.1. Single lookup without installing simdref
+
+Use this only to answer one intrinsic or instruction question, not as a
+substitute for the pipeline. It needs no simdref install and no PyPI or
+GitHub access, only the deployed site's static JSON export.
+
+1. Compute the intrinsic's 3-char chunk prefix: strip leading
+   underscores, strip one width token (`mm`, `mm256`, `mm512`, `sv`,
+   `v`, `vq`), lowercase the rest, and take the first 3 alphanumeric
+   characters. Example: `_mm256_fmadd_pd` strips to `fmaddpd`, so the
+   prefix is `fma`.
+1. Fetch that chunk and print the entry:
+   ```bash
+   curl -fsSL https://<simdref-pages-domain>/intrinsic-chunks/<prefix>.json -o /tmp/chunk.json
+   python3 -c "import json; print(json.load(open('/tmp/chunk.json'))['<intrinsic_name>'])"
+   ```
+   The entry carries `signature`, `instructions`, and `doc_sections`.
+1. For an instruction's latency and CPI, fetch the flat index and look
+   up the `<arch>:<form-lower>` key:
+   ```bash
+   curl -fsSL https://<simdref-pages-domain>/latency-index.json -o /tmp/latency.json
+   python3 -c "import json; print(json.load(open('/tmp/latency.json'))['<arch>:<form-lower>'])"
+   ```
+
+This is a different fallback than the freshness probe in §0b: §0b checks
+whether the installed package and this skill are current, this fallback
+answers a lookup when there is no install at all. Go back to
+`simdref annotate` and `simdref llm batch` (§4, §5) for anything past a
+single lookup — batch-resolving a whole region does not scale to
+per-mnemonic curl calls.
+
 ### 0b. Already installed — freshness probe (run at most once per session)
 
 Before the first real pipeline run in a conversation, check both the
