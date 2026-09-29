@@ -10,15 +10,36 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      # Which core repo's release to install simdref from. Overridden by the
+      # `CORE_REPO` repository variable on a validation fork; production
+      # leaves it unset and gets the real simdref repo.
+      SIMDREF_CORE_REPO: ${{ vars.CORE_REPO || 'DiamonDinoia/simdref' }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: true
+          activate-environment: true
+          python-version: "3.12"
       - name: bundle drift check (skill/ vs skills/, codex-skills/)
         run: python3 scripts/build_skill_bundles.py --check
       - name: plugin manifest version-sync check
         run: python3 scripts/check-version-sync.py
+      - name: Install simdref
+        # The catalog-parity test needs the CLI and a real catalog at run
+        # time. Installs the wheel from SIMDREF_CORE_REPO's latest versioned
+        # release (skips its `data-*` catalog releases, which carry no wheel).
+        run: |
+          tag=$(gh api "repos/${SIMDREF_CORE_REPO}/releases" --jq '[.[] | select(.tag_name | test("^v[0-9]")) | .tag_name][0]')
+          [ -n "$tag" ] || { echo "::error::no versioned release found on ${SIMDREF_CORE_REPO}"; exit 1; }
+          gh release download "$tag" --repo "$SIMDREF_CORE_REPO" --pattern '*.whl' --dir /tmp/simdref-wheel --clobber
+          uv pip install pytest /tmp/simdref-wheel/*.whl
+      - name: Pull catalog
+        run: simdref update --from-release
       - name: tests
-        run: uvx pytest tests/ -q
+        run: uv run pytest tests/ -q
