@@ -14,7 +14,7 @@ jobs:
       # Which core repo's release to install simdref from. Overridden by the
       # `CORE_REPO` repository variable on a validation fork; production
       # leaves it unset and gets the real simdref repo.
-      SIMDREF_CORE_REPO: ${{ vars.CORE_REPO || 'DiamonDinoia/simdref' }}
+      SIMDREF_CORE_REPO: ${{ vars.CORE_REPO || 'simd-labs/simdref' }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7

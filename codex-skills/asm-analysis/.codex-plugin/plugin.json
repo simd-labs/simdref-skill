@@ -7,8 +7,8 @@
     "email": "mbarbone@flatironinstitute.org"
   },
   "license": "GPL-3.0-or-later",
-  "repository": "https://github.com/DiamonDinoia/simdref",
-  "homepage": "https://github.com/DiamonDinoia/simdref",
+  "repository": "https://github.com/simd-labs/simdref-skill",
+  "homepage": "https://github.com/simd-labs/simdref-skill",
   "keywords": [
     "asm",
     "simd",
@@ -28,7 +28,7 @@
     "capabilities": [
       "Interactive"
     ],
-    "websiteURL": "https://github.com/DiamonDinoia/simdref",
+    "websiteURL": "https://github.com/simd-labs/simdref-skill",
     "defaultPrompt": [
       "Inspect the generated assembly for this hot loop and propose SIMD-oriented optimisations."
     ]

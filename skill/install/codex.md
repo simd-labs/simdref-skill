@@ -3,7 +3,7 @@
 Preferred (marketplace one-liner, from a Codex CLI prompt):
 
 ```
-codex plugin marketplace add DiamonDinoia/simdref
+codex plugin marketplace add simd-labs/simdref-skill
 /plugins
 ```
 
@@ -14,10 +14,10 @@ or `~/.agents/skills/` (user). See the
 [Codex skills docs](https://developers.openai.com/codex/skills).
 
 ```bash
-git clone https://github.com/DiamonDinoia/simdref.git ~/src/simdref
+git clone https://github.com/simd-labs/simdref-skill.git ~/src/simdref-skill
 mkdir -p ~/.agents/skills
-ln -sf ~/src/simdref/codex-skills/asm-analysis/skills/asm-analysis \
+ln -sf ~/src/simdref-skill/codex-skills/asm-analysis/skills/asm-analysis \
        ~/.agents/skills/asm-analysis
 ```
 
-Refresh by updating the checkout: `(cd ~/src/simdref && git pull)`.
+Refresh by updating the checkout: `(cd ~/src/simdref-skill && git pull)`.

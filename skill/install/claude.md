@@ -5,7 +5,7 @@ source tree, which is also published as a Claude Code plugin
 marketplace. Preferred install at the Claude Code prompt:
 
 ```
-/plugin marketplace add DiamonDinoia/simdref
+/plugin marketplace add simd-labs/simdref-skill
 /plugin install asm-analysis@simdref
 ```
 
@@ -20,14 +20,14 @@ Manual alternatives, either symlink from a checkout for always-current
 updates or install a one-off snapshot:
 
 ```bash
-git clone https://github.com/DiamonDinoia/simdref.git ~/src/simdref
+git clone https://github.com/simd-labs/simdref-skill.git ~/src/simdref-skill
 mkdir -p ~/.claude/skills
-ln -sf ~/src/simdref/skills/asm-analysis ~/.claude/skills/asm-analysis
-# later: (cd ~/src/simdref && git pull)  # updates skill in place
+ln -sf ~/src/simdref-skill/skills/asm-analysis ~/.claude/skills/asm-analysis
+# later: (cd ~/src/simdref-skill && git pull)  # updates skill in place
 
 # or snapshot:
 mkdir -p ~/.claude/skills/asm-analysis && \
-  curl -fsSL https://raw.githubusercontent.com/DiamonDinoia/simdref/main/skills/asm-analysis/SKILL.md \
+  curl -fsSL https://raw.githubusercontent.com/simd-labs/simdref-skill/main/skills/asm-analysis/SKILL.md \
   -o ~/.claude/skills/asm-analysis/SKILL.md
 ```
 

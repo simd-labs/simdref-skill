@@ -19,13 +19,13 @@ from `main`** — the released PyPI build lags behind upstream fixes.
 
 1. **From GitHub `main` via pipx (recommended):**
    ```bash
-   pipx install "git+https://github.com/DiamonDinoia/simdref.git@main"
+   pipx install "git+https://github.com/simd-labs/simdref.git@main"
    ```
 1. **From GitHub `main` into a project-local venv:**
    ```bash
    python -m venv .venv
    source .venv/bin/activate
-   pip install "git+https://github.com/DiamonDinoia/simdref.git@main"
+   pip install "git+https://github.com/simd-labs/simdref.git@main"
    ```
    Subsequent `simdref …` calls require the venv to be active (or use the absolute path `.venv/bin/simdref`).
 1. **From a local source checkout (if the user has the repo cloned):**
@@ -40,7 +40,7 @@ from `main`** — the released PyPI build lags behind upstream fixes.
    ```
 1. **Transient per-invocation via uvx (no install state):**
    ```bash
-   uvx --from "git+https://github.com/DiamonDinoia/simdref.git@main" simdref <args...>
+   uvx --from "git+https://github.com/simd-labs/simdref.git@main" simdref <args...>
    ```
    In this mode, prepend the `uvx --from ...` prefix to every `simdref …` invocation in the rest of this skill.
 
@@ -65,14 +65,14 @@ GitHub access, only the deployed site's static JSON export.
    prefix is `fma`.
 1. Fetch that chunk and print the entry:
    ```bash
-   curl -fsSL https://<simdref-pages-domain>/intrinsic-chunks/<prefix>.json -o /tmp/chunk.json
+   curl -fsSL https://simdref.diamondinoia.com/intrinsic-chunks/<prefix>.json -o /tmp/chunk.json
    python3 -c "import json; print(json.load(open('/tmp/chunk.json'))['<intrinsic_name>'])"
    ```
    The entry carries `signature`, `instructions`, and `doc_sections`.
 1. For an instruction's latency and CPI, fetch the flat index and look
    up the `<arch>:<form-lower>` key:
    ```bash
-   curl -fsSL https://<simdref-pages-domain>/latency-index.json -o /tmp/latency.json
+   curl -fsSL https://simdref.diamondinoia.com/latency-index.json -o /tmp/latency.json
    python3 -c "import json; print(json.load(open('/tmp/latency.json'))['<arch>:<form-lower>'])"
    ```
 
@@ -88,7 +88,8 @@ per-mnemonic curl calls.
 Before the first real pipeline run in a conversation, check both the
 package *and* this skill for upstream changes. The probe below is
 self-contained: it compares installed state against
-`github.com/DiamonDinoia/simdref`, caches the result under
+`github.com/simd-labs/simdref` (package) and
+`github.com/simd-labs/simdref-skill` (this skill), caches the result under
 `~/.cache/simdref-asm-skill/` with a 6-hour TTL, and surfaces exactly
 one notice when something is newer.
 
@@ -112,13 +113,13 @@ else
 
   # 3. Latest main-branch commit touching any simdref source.
   # /commits/main returns a single commit object, so index the dict directly.
-  main_sha=$(curl -fsSL "https://api.github.com/repos/DiamonDinoia/simdref/commits/main" | python -c "import json,sys; print(json.load(sys.stdin)['sha'][:7])" 2>/dev/null || echo "?")
+  main_sha=$(curl -fsSL "https://api.github.com/repos/simd-labs/simdref/commits/main" | python -c "import json,sys; print(json.load(sys.stdin)['sha'][:7])" 2>/dev/null || echo "?")
 
   # 4. Latest main-branch commit touching THIS skill file
-  skill_sha=$(curl -fsSL "https://api.github.com/repos/DiamonDinoia/simdref/commits?path=skills/asm-analysis/references/workflow.md&per_page=1" | python -c "import json,sys; print(json.load(sys.stdin)[0]['sha'][:7])" 2>/dev/null || echo "?")
+  skill_sha=$(curl -fsSL "https://api.github.com/repos/simd-labs/simdref-skill/commits?path=skill/references/workflow.md&per_page=1" | python -c "import json,sys; print(json.load(sys.stdin)[0]['sha'][:7])" 2>/dev/null || echo "?")
 
   # 5. Number of unreleased commits on main past the latest tag
-  unreleased=$(curl -fsSL "https://api.github.com/repos/DiamonDinoia/simdref/compare/v${pypi}...main" | python -c "import json,sys; print(json.load(sys.stdin).get('ahead_by', 0))" 2>/dev/null || echo "?")
+  unreleased=$(curl -fsSL "https://api.github.com/repos/simd-labs/simdref/compare/v${pypi}...main" | python -c "import json,sys; print(json.load(sys.stdin).get('ahead_by', 0))" 2>/dev/null || echo "?")
 
   printf 'installed=%s  pypi=%s  main-HEAD=%s  workflow-HEAD=%s  unreleased=%s\n' \
     "$installed" "$pypi" "$main_sha" "$skill_sha" "$unreleased"
@@ -133,7 +134,7 @@ that matches; do not nag a second time in the same session):
 | Condition                                                                                        | Ask the user                                                                                                                                                          |
 | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `installed < pypi`                                                                               | Minor-release available — offer `pipx upgrade simdref`.                                                                                                               |
-| `unreleased >= 1`                                                                                | Pre-release with N commits past `v$pypi`. Offer `pipx install --force git+https://github.com/DiamonDinoia/simdref.git@main`. Mention this is optional.                |
+| `unreleased >= 1`                                                                                | Pre-release with N commits past `v$pypi`. Offer `pipx install --force git+https://github.com/simd-labs/simdref.git@main`. Mention this is optional.                |
 | `skill_sha` differs from the last one stored in `~/.cache/simdref-asm-skill/last-seen-skill-sha` | Skill workflow has been updated upstream. Offer the product-specific update path from the skill entrypoint, or `(cd ~/src/simdref && git pull)` for symlink installs. |
 | None of the above                                                                                | Silent — record the state and continue.                                                                                                                               |
 

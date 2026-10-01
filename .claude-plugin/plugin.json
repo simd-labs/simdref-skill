@@ -7,7 +7,7 @@
     "email": "mbarbone@flatironinstitute.org"
   },
   "license": "GPL-3.0-or-later",
-  "repository": "https://github.com/DiamonDinoia/simdref",
-  "homepage": "https://github.com/DiamonDinoia/simdref",
+  "repository": "https://github.com/simd-labs/simdref-skill",
+  "homepage": "https://github.com/simd-labs/simdref-skill",
   "skills": "./skills/"
 }
