@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # Which core repo's release to install simdref from. Overridden by the
       # `CORE_REPO` repository variable on a validation fork; production
