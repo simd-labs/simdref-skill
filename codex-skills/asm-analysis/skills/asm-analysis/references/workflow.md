@@ -109,17 +109,17 @@ else
   installed=$(simdref --version 2>/dev/null | awk '{print $NF}')
 
   # 2. Latest PyPI release
-  pypi=$(curl -fsSL https://pypi.org/pypi/simdref/json | python -c "import json,sys; print(json.load(sys.stdin)['info']['version'])" 2>/dev/null || echo "?")
+  pypi=$(rm -f ~/.cache/simdref-asm-skill/tmp-pypi.json; curl -fsSL -o ~/.cache/simdref-asm-skill/tmp-pypi.json https://pypi.org/pypi/simdref/json && python -c "import json,sys; print(json.load(sys.stdin)['info']['version'])" 2>/dev/null < ~/.cache/simdref-asm-skill/tmp-pypi.json || echo "?")
 
   # 3. Latest main-branch commit touching any simdref source.
   # /commits/main returns a single commit object, so index the dict directly.
-  main_sha=$(curl -fsSL "https://api.github.com/repos/simd-labs/simdref/commits/main" | python -c "import json,sys; print(json.load(sys.stdin)['sha'][:7])" 2>/dev/null || echo "?")
+  main_sha=$(rm -f ~/.cache/simdref-asm-skill/tmp-main.json; curl -fsSL -o ~/.cache/simdref-asm-skill/tmp-main.json "https://api.github.com/repos/simd-labs/simdref/commits/main" && python -c "import json,sys; print(json.load(sys.stdin)['sha'][:7])" 2>/dev/null < ~/.cache/simdref-asm-skill/tmp-main.json || echo "?")
 
   # 4. Latest main-branch commit touching THIS skill file
-  skill_sha=$(curl -fsSL "https://api.github.com/repos/simd-labs/simdref-skill/commits?path=skill/references/workflow.md&per_page=1" | python -c "import json,sys; print(json.load(sys.stdin)[0]['sha'][:7])" 2>/dev/null || echo "?")
+  skill_sha=$(rm -f ~/.cache/simdref-asm-skill/tmp-skill.json; curl -fsSL -o ~/.cache/simdref-asm-skill/tmp-skill.json "https://api.github.com/repos/simd-labs/simdref-skill/commits?path=skill/references/workflow.md&per_page=1" && python -c "import json,sys; print(json.load(sys.stdin)[0]['sha'][:7])" 2>/dev/null < ~/.cache/simdref-asm-skill/tmp-skill.json || echo "?")
 
   # 5. Number of unreleased commits on main past the latest tag
-  unreleased=$(curl -fsSL "https://api.github.com/repos/simd-labs/simdref/compare/v${pypi}...main" | python -c "import json,sys; print(json.load(sys.stdin).get('ahead_by', 0))" 2>/dev/null || echo "?")
+  unreleased=$(rm -f ~/.cache/simdref-asm-skill/tmp-compare.json; curl -fsSL -o ~/.cache/simdref-asm-skill/tmp-compare.json "https://api.github.com/repos/simd-labs/simdref/compare/v${pypi}...main" && python -c "import json,sys; print(json.load(sys.stdin).get('ahead_by', 0))" 2>/dev/null < ~/.cache/simdref-asm-skill/tmp-compare.json || echo "?")
 
   printf 'installed=%s  pypi=%s  main-HEAD=%s  workflow-HEAD=%s  unreleased=%s\n' \
     "$installed" "$pypi" "$main_sha" "$skill_sha" "$unreleased"
